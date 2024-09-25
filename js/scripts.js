@@ -1,40 +1,74 @@
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('DOM Ready...FAMILY');
+document.addEventListener("DOMContentLoaded", function () {
+  console.log("DOM Ready...FAMILY");
 
-    const rootDiv = document.querySelector('#root');
-    const button = document.createElement('button');
-    button.innerText = 'CLICK ME!';
-    button.classList.add('button')
+  const rootDiv = document.querySelector("#root");
+  // const button = document.createElement('button');
 
-    button.addEventListener('click', function (e) {
-        e.preventDefault();
-        fetchQuote();
+  // button.innerText = 'CLICK ME!';
+  // button.classList.add('button')
+
+  // button.addEventListener('click', function (e) {
+  //     e.preventDefault();
+  //     fetchQuote();
+  // });
+
+  // rootDiv.appendChild(button);
+
+  function fetchQuote() {
+    const url = "https://api.chucknorris.io/jokes/random";
+    const options = { method: "GET" };
+    fetch(url, options)
+      .then(function (response) {
+        console.log("RESPONSE: ", response);
+        return response.json();
+      })
+      .then(function (data) {
+        return generateQuote(data);
+      });
+  }
+
+  function fetchCategories() {
+    const url = "https://api.chucknorris.io/jokes/categories";
+    const options = { method: "GET" };
+    fetch(url, options)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+        return generateCategoryList(data);
+      });
+  }
+
+  function generateQuote(data) {
+    const paragraph = document.createElement("p");
+    paragraph.innerHTML = data.value;
+    rootDiv.appendChild(paragraph);
+  }
+
+  function generateCategoryList(categories) {
+    const categoryList = document.createElement("ul");
+
+    const safeForGrandma = categories.filter(function (category) {
+      if (
+        category != "explicit" &&
+        category != "religion" &&
+        category != "political"
+      ) {
+        return category;
+      }
     });
 
-    rootDiv.appendChild(button);
+    console.log("CATEGORIES AND SAFE CATS", categories, safeForGrandma);
 
-    const url = 'https://api.chucknorris.io/jokes/random';
-    const options = { method: 'GET' };
+    safeForGrandma.map(function (category) {
+      const listItem = document.createElement("li");
+      listItem.innerHTML = category;
+      categoryList.appendChild(listItem);
+    });
 
-    function fetchQuote() {
-        fetch(url, options)
-            .then(function (response) {
-                console.log('RESPONSE: ', response);
-                return response.json();
-            })
-            .then(function (data) {
-                return generateQuote(data);
-            });
-    }
+    rootDiv.appendChild(categoryList);
+  }
 
-    function generateQuote(data) {
-        console.log('DATA: ', data);
-
-        const paragraph = document.createElement('p');
-        paragraph.innerHTML = data.value;
-        console.log('PARAGRAPH? ', paragraph);
-        rootDiv.appendChild(paragraph);
-    }
-
-    fetchQuote();
+  fetchQuote();
+  fetchCategories();
 });
